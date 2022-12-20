@@ -1,2 +1,2 @@
 # Minimal FastAPI Stable Diffusion Application
-Basic FastAPI webapp for local image generation with stable diffusion.
+Basic [FastAPI](https://fastapi.tiangolo.com) webapp for local image generation with HuggingFace [stable diffusion](https://huggingface.co/CompVis/stable-diffusion).
