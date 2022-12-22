@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Stable Diffusion Image Generator</title>
+    </head>
+    <body>
+        <form id="form" action="/generate-image/" method="post">
+            <label for="prompt">Enter prompt:</label><br>
+            <input type="text" id="prompt" name="prompt"><br>
+            <input type="submit" value="Submit">
+        </form>
+        <div id="image-container"></div>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $("#form").submit(function(e) {
+                data= JSON.stringify({
+                    prompt: $('#prompt').val()
+                })
+                console.log(data)
+                $.ajax({
+                    type: "POST",
+                    url: "/generate-image",
+                    data: JSON.stringify({
+                        prompt_text: $('#prompt').val()
+                    }),
+                    contentType: "application/json",
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log(response);
+                        $("#image-container").html('<img src="static/image.jpg" alt="Generated Image">');
+                    }
+                });
+                e.preventDefault();
+            });
+        </script>
+    </body>
+</html>

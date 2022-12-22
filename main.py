@@ -1,6 +1,7 @@
 import io
-from fastapi import FastAPI
-from fastapi.responses import FileResponse, StreamingResponse, Response
+from fastapi import FastAPI, File, Request
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, StreamingResponse, HTMLResponse
 
 # FastAPI is effectively Starlette + Pydantic
 from pydantic import BaseModel
@@ -9,10 +10,14 @@ from ml import obtain_image
 
 app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="./static"), name="static")
+
 
 @app.get("/")
-def read_root():
-    return {"Hello": "World"}
+def index():
+    with open("templates/index.html") as f:
+        html = f.read()
+    return HTMLResponse(html)
 
 
 # @app.get("/items/{item_id}")
@@ -30,24 +35,28 @@ def read_root():
 # @app.post("/items/")
 # def create_item(item: Item):
 #     return item
+class ImageRequest(BaseModel):
+    prompt_text: str
 
 
-@app.get("/generate_file")
-def generate_image(
-    prompt: str,
-    *,
+@app.post("/generate-image")
+async def generate_image(
+    prompt_text: ImageRequest,
     seed: int | None = None,
     num_inference_steps: int = 50,
-    guidance_scale: float = 7.5
+    guidance_scale: float = 7.5,
 ):
+
+    prompt = prompt_text.dict()["prompt_text"]
+    print(prompt)
     image = obtain_image(
         prompt,
         num_inference_steps=num_inference_steps,
         seed=seed,
         guidance_scale=guidance_scale,
     )
-    image.save("image.png")
-    return FileResponse("image.png")
+    image.save("static/image.jpg")
+    return File("static/image.jpg", content_type="image/jpeg")
 
 
 @app.get("/generate")
